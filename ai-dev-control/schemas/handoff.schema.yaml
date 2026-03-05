@@ -1,0 +1,112 @@
+# handoff.schema.yaml
+# Structured handoff artifact for AI-to-AI communication
+# Version: 1.0 — 2026-03-05
+#
+# USAGE:
+#   - Produced by the outgoing agent at session end
+#   - Committed to repo at: docs/handoffs/HANDOFF_{FROM}_{TO}_{DC}_{DATE}.yaml
+#   - Read by the incoming agent at session start BEFORE any other context
+#   - All required fields must be present — missing required fields = invalid handoff
+#   - Incoming agent must acknowledge each open_question before proceeding
+#
+# FIELD TYPES:
+#   string       — plain text, single line
+#   text         — plain text, multi-line allowed
+#   enum         — one of the listed values only
+#   list<string> — array of strings
+#   list<item>   — array of structured objects (see field definition)
+#   boolean      — true or false
+#   date         — YYYY-MM-DD
+#   nullable     — field may be null if not applicable
+
+---
+
+# ─── HEADER (all required) ────────────────────────────────────────────────────
+
+schema_version: string          # "1.0" — must match this file's version
+date: date                      # YYYY-MM-DD
+from_role: enum                 # CTO | DEV | PM | REVIEWER
+to_role: enum                   # CTO | DEV | PM | REVIEWER | HUMAN
+dc_identifier: string           # e.g. "DC-W3-07d" — or "NONE" if not DC-specific
+brief_path: string              # repo-relative path to brief, or "NONE"
+session_summary: string         # one sentence — what this session accomplished
+
+# ─── DECISIONS (required, min 0 items) ───────────────────────────────────────
+
+decisions:
+  - description: string         # what was decided — one sentence
+    rationale: string           # why — one sentence
+    immutable: boolean          # true = must not be re-opened by receiving agent
+
+# ─── ARTIFACTS (required, min 0 items) ───────────────────────────────────────
+
+artifacts:
+  - name: string                # human-readable name
+    path: string                # repo-relative path
+    status: enum                # DRAFT | FINAL | COMMITTED | APPLIED
+    notes: string | null        # nullable — any caveat the receiver needs to know
+
+# ─── FILES CHANGED (required, min 0 items) ───────────────────────────────────
+
+files_changed:
+  - path: string                # repo-relative path
+    change_type: enum           # CREATED | MODIFIED | DELETED | READ_ONLY
+    notes: string | null        # nullable
+
+# ─── COMMANDS RUN (required, min 0 items) ────────────────────────────────────
+# List significant commands run this session. Read-only diagnostics may be omitted.
+
+commands_run:
+  - command: string             # the command as run
+    outcome: string             # one-line result or "OK"
+    side_effects: boolean       # true if command wrote to DB, remote, or filesystem
+
+# ─── CURRENT STATE (all required) ────────────────────────────────────────────
+
+current_state:
+  branch: string                # current git branch, or "main"
+  local_db_status: string       # e.g. "migration 059 applied, not synced to remote"
+  remote_sync_status: string    # e.g. "GitHub up to date; Turso NOT synced"
+  pipeline_last_run: string | null    # nullable — e.g. "CSL: precision 81%, recall 54%"
+  known_issues: list<string>    # list of known issues, or empty list []
+
+# ─── OPEN QUESTIONS (required, min 0 items) ──────────────────────────────────
+# Receiving agent MUST surface each open question to human before acting on
+# anything that depends on it. Do not proceed past an open question autonomously.
+
+open_questions:
+  - question: string            # what needs to be resolved
+    blocks: string              # what the receiver cannot do until this is resolved
+    owner: enum                 # HUMAN | CTO | DEV — who resolves this
+
+# ─── DO NOT (required, min 1 item) ───────────────────────────────────────────
+# Negative constraints carried forward from the brief.
+# Receiving agent treats these as immutable for this handoff's scope.
+
+do_not:
+  - string                      # one negative constraint per item
+
+# ─── AUTONOMOUS EXECUTION AUTHORITY (required) ───────────────────────────────
+# What the receiving agent may do without pausing.
+# Inherits from AUTONOMOUS_EXECUTION.md defaults; override here if narrower.
+
+autonomous_authority:
+  may_proceed:
+    - string                    # action class the receiver may take autonomously
+  must_checkpoint:
+    - string                    # action class requiring human confirmation
+
+# ─── RISK (required) ─────────────────────────────────────────────────────────
+
+risk:
+  level: enum                   # LOW | MEDIUM | HIGH
+  systems_affected: integer     # count of systems directly affected
+  rationale: string             # one sentence
+
+# ─── HUMAN LOOP (required) ───────────────────────────────────────────────────
+
+human_loop:
+  required_before_proceeding: boolean   # true = human must review before receiver acts
+  review_items: list<string>            # what human needs to review/approve (if required)
+  # If required_before_proceeding is false, receiver may begin autonomous work
+  # on items covered by autonomous_authority above.

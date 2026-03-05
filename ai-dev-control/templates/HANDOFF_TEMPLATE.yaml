@@ -1,0 +1,75 @@
+# HANDOFF TEMPLATE
+# Schema: schemas/handoff.schema.yaml v1.0
+# Copy this file, fill all fields, commit before session ends.
+# File naming: docs/handoffs/HANDOFF_{FROM}_{TO}_{DC}_{DATE}.yaml
+
+schema_version: "1.0"
+date: YYYY-MM-DD
+from_role: CTO                  # CTO | DEV | PM | REVIEWER
+to_role: DEV                    # CTO | DEV | PM | REVIEWER | HUMAN
+dc_identifier: DC-XX-XXX        # or NONE
+brief_path: docs/briefs/...     # or NONE
+session_summary: >
+  [One sentence — what this session accomplished.]
+
+decisions:
+  - description: >
+      [What was decided — one sentence.]
+    rationale: >
+      [Why — one sentence.]
+    immutable: false             # true = receiver must not re-open this
+
+artifacts:
+  - name: "[name]"
+    path: "[repo-relative path]"
+    status: DRAFT                # DRAFT | FINAL | COMMITTED | APPLIED
+    notes: null
+
+files_changed:
+  - path: "[repo-relative path]"
+    change_type: MODIFIED        # CREATED | MODIFIED | DELETED | READ_ONLY
+    notes: null
+
+commands_run:
+  - command: "[command as run]"
+    outcome: "[one-line result or OK]"
+    side_effects: false          # true if wrote to DB, remote, or filesystem
+
+current_state:
+  branch: "[current branch]"
+  local_db_status: "[migration status, row counts if relevant]"
+  remote_sync_status: "[GitHub and remote DB sync status]"
+  pipeline_last_run: null        # or "COMPANY: precision X%, recall Y%"
+  known_issues:
+    - "[known issue or empty list]"
+
+open_questions:
+  - question: >
+      [What needs to be resolved.]
+    blocks: >
+      [What receiver cannot do until this is resolved.]
+    owner: HUMAN                 # HUMAN | CTO | DEV
+
+do_not:
+  - "[Negative constraint 1]"
+  - "[Negative constraint 2]"
+
+autonomous_authority:
+  may_proceed:
+    - All read-only shell commands (grep, cat, ls, git log, git diff, --help flags)
+    - SELECT queries against local DB
+    - Reading any file in the repository
+    - "[Add brief-specific autonomous actions]"
+  must_checkpoint:
+    - Any remote sync or push
+    - Any database write or migration
+    - "[Add brief-specific checkpoint triggers]"
+
+risk:
+  level: LOW                     # LOW | MEDIUM | HIGH
+  systems_affected: 0
+  rationale: "[One sentence.]"
+
+human_loop:
+  required_before_proceeding: false
+  review_items: []               # list items if required_before_proceeding: true

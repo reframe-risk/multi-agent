@@ -1,0 +1,119 @@
+# brief.schema.yaml
+# Structured engineering brief for AI dev sessions
+# Version: 1.0 — 2026-03-05
+#
+# USAGE:
+#   - Authored by CTO or PM
+#   - Stored at: docs/briefs/{DC_IDENTIFIER}_BRIEF_{DATE}.yaml
+#   - Read by receiving agent (Dev) at session start
+#   - Prose rationale goes in the 'rationale' field only — all other fields are typed
+#   - GitHub Issues using this schema use YAML front-matter + prose body for rationale
+#
+# DESIGN PRINCIPLE:
+#   Structured fields = agent-readable, unambiguous, no interpretation required
+#   Rationale prose = human-readable context, not instructions
+
+---
+
+# ─── HEADER (all required) ────────────────────────────────────────────────────
+
+schema_version: string          # "1.0"
+dc_identifier: string           # e.g. "DC-W3-07d"
+title: string                   # short title
+date: date                      # YYYY-MM-DD
+workstream: string              # e.g. "WS-01 — Precision and Verifiability"
+priority: enum                  # P1 | P2 | P3
+owner: string                   # name
+prerequisite: string            # DC identifier or "NONE"
+risk_level: enum                # LOW | MEDIUM | HIGH
+systems_affected: integer       # count
+
+# ─── PROBLEM (required) ───────────────────────────────────────────────────────
+
+problem:
+  root_cause: string            # measured, not estimated — one sentence
+  metrics:                      # quantified current state
+    - metric: string            # e.g. "CSL precision"
+      value: string             # e.g. "12.1%"
+      source: string            # e.g. "ground truth measurement 2026-02-24"
+  rationale: text               # prose — why this matters, context for the numbers
+
+# ─── AUTONOMOUS EXECUTION AUTHORITY (required) ────────────────────────────────
+
+autonomous_authority:
+  may_proceed:
+    - string                    # action class the agent may take without pausing
+  must_checkpoint:
+    - string                    # action class requiring human confirmation before acting
+
+# ─── PHASES (required, min 1) ────────────────────────────────────────────────
+
+phases:
+  - id: integer                 # 1, 2, 3...
+    name: string                # short name
+    task: text                  # what to do — specific enough to execute without clarification
+    output:
+      type: enum                # FILE | QUERY_RESULT | MEASUREMENT | DOCUMENT | CODE_CHANGE
+      path: string | null       # repo-relative path if FILE or CODE_CHANGE, else null
+      description: string       # what the output contains
+    validation_gate: string     # how to confirm this phase is correct before next phase starts
+
+# ─── DO NOT (required, min 1) ─────────────────────────────────────────────────
+
+do_not:
+  - string                      # one negative constraint per item
+
+# ─── VERIFICATION (required) ──────────────────────────────────────────────────
+
+verification:
+  commands:
+    - step: integer
+      command: string
+      purpose: string
+  expected_outcomes:
+    - string                    # measurable expected result
+
+# ─── SUCCESS CRITERIA (required, min 1) ───────────────────────────────────────
+
+success_criteria:
+  - id: integer
+    description: string         # measurable outcome
+    measurable: boolean         # true = has a specific number or state to check
+
+# ─── SELF CHECK (required, min 1) ─────────────────────────────────────────────
+# Agent runs this checklist before marking the DC complete.
+# Each item must be verifiable — not subjective.
+
+self_check:
+  - item: string                # specific check
+    verification_method: string # how to confirm — command, query, file diff, etc.
+
+# ─── CHANGE IMPACT (required) ─────────────────────────────────────────────────
+
+change_impact:
+  systems:
+    - name: string
+      impact: enum              # IMPACTED | INDIRECTLY_AFFECTED | NOT_AFFECTED
+      description: string       # what specifically changes
+  regression_risk: text         # what existing behaviour might be affected and how to check
+
+# ─── OUT OF SCOPE (required, min 1) ───────────────────────────────────────────
+
+out_of_scope:
+  - string                      # explicit item that is deferred or excluded
+
+# ─── OUTPUT DOCUMENTS (required, min 1) ───────────────────────────────────────
+
+output_documents:
+  - description: string
+    path: string                # repo-relative path
+
+# ─── HANDOFF (required) ───────────────────────────────────────────────────────
+
+handoff:
+  produces_artifact: boolean    # true = agent must produce handoff.yaml at session end
+  to_role: enum | null          # CTO | DEV | PM | REVIEWER | HUMAN — nullable if no handoff
+  tracker_update:
+    file: string                # e.g. "docs/control/WAVE3_TRACKER.md"
+    dc_identifier: string
+    on_complete: enum           # COMPLETE | IN_PROGRESS | BLOCKED
