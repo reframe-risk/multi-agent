@@ -1,6 +1,6 @@
 # brief.schema.yaml
 # Structured engineering brief for AI dev sessions
-# Version: 1.0 — 2026-03-05
+# Version: 1.1 — 2026-03-05 (added assigned_role per Decision 003)
 #
 # USAGE:
 #   - Authored by CTO or PM
@@ -17,13 +17,15 @@
 
 # ─── HEADER (all required) ────────────────────────────────────────────────────
 
-schema_version: string          # "1.0"
+schema_version: string          # "1.1"
 dc_identifier: string           # e.g. "DC-W3-07d"
 title: string                   # short title
 date: date                      # YYYY-MM-DD
 workstream: string              # e.g. "WS-01 — Precision and Verifiability"
 priority: enum                  # P1 | P2 | P3
 owner: string                   # name
+assigned_role: enum             # CTO | PIPELINE_DEV | INFRA_DEV | VALIDATION_DEV | FRONTEND_DEV
+                                # the role that executes this brief — determines default autonomous authority
 prerequisite: string            # DC identifier or "NONE"
 risk_level: enum                # LOW | MEDIUM | HIGH
 systems_affected: integer       # count

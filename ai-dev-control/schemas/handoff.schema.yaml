@@ -1,6 +1,6 @@
 # handoff.schema.yaml
 # Structured handoff artifact for AI-to-AI communication
-# Version: 1.0 — 2026-03-05
+# Version: 1.1 — 2026-03-05 (expanded role enums per Decision 003)
 #
 # USAGE:
 #   - Produced by the outgoing agent at session end
@@ -25,8 +25,8 @@
 
 schema_version: string          # "1.0" — must match this file's version
 date: date                      # YYYY-MM-DD
-from_role: enum                 # CTO | DEV | PM | REVIEWER
-to_role: enum                   # CTO | DEV | PM | REVIEWER | HUMAN
+from_role: enum                 # CTO | PIPELINE_DEV | INFRA_DEV | VALIDATION_DEV | FRONTEND_DEV | PM | REVIEWER
+to_role: enum                   # CTO | PIPELINE_DEV | INFRA_DEV | VALIDATION_DEV | FRONTEND_DEV | PM | REVIEWER | HUMAN
 dc_identifier: string           # e.g. "DC-W3-07d" — or "NONE" if not DC-specific
 brief_path: string              # repo-relative path to brief, or "NONE"
 session_summary: string         # one sentence — what this session accomplished

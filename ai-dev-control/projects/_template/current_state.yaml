@@ -1,0 +1,50 @@
+# current_state.yaml — [PROJECT NAME]
+# Volatile session state — updated by agent at every session end
+# Schema: project-specific (adapt fields to project's metrics and state)
+# Last updated: YYYY-MM-DD — [one-line session summary]
+
+schema_version: "1.0"
+project: "[project name]"
+last_updated: YYYY-MM-DD
+last_session_summary: >
+  [One sentence describing what the last session accomplished.]
+
+# ─── METRICS ─────────────────────────────────────────────────────────────────
+# Adapt this section to the project's measurable outputs.
+# Remove, rename, or add fields as needed.
+
+metrics:
+  "[metric name]":
+    value: null
+    as_of: null
+    notes: null
+
+# ─── DATABASE / INFRASTRUCTURE STATE ─────────────────────────────────────────
+
+infrastructure:
+  "[state field]": null         # e.g. schema_version, migrations applied, token expiry
+
+# ─── ACTIVE WORK ─────────────────────────────────────────────────────────────
+
+active_work:
+  identifier: null              # DC, issue, or task identifier
+  title: null
+  status: PENDING               # PENDING | IN_PROGRESS | BLOCKED | COMPLETE
+  brief_path: null
+  blocked_by: null
+
+# ─── OPEN BLOCKERS ────────────────────────────────────────────────────────────
+
+open_blockers:
+  - id: BLOCKER-001
+    description: null
+    resolves_by: null
+    owner: HUMAN                # HUMAN | CTO | DEV
+
+# ─── PENDING STRUCTURAL TASKS ─────────────────────────────────────────────────
+
+structural_tasks:
+  - id: STRUCT-001
+    title: null
+    status: PENDING
+    brief: null
